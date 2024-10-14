@@ -1,0 +1,25 @@
+/* static/css/styles.css */
+
+.navbar {
+    background-color: #f8f9fa !important; /* Cambia el fondo del navbar */
+}
+
+.navbar-brand {
+    color: #007bff !important; /* Color de la marca */
+    font-weight: bold; /* Negrita */
+}
+
+.nav-link {
+    color: #343a40 !important; /* Color de los enlaces */
+    transition: color 0.3s; /* Transición suave al cambiar de color */
+}
+
+.nav-link:hover {
+    color: #007bff !important; /* Color al pasar el ratón sobre el enlace */
+}
+
+@media (max-width: 768px) {
+    .navbar-nav {
+        text-align: center; /* Centrar el texto en pantallas pequeñas */
+    }
+}
