@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Carrito de Compras</h1>
+
+<!-- Buscador de Productos -->
+<div class="buscador">
+    <input type="text" id="buscador-input" placeholder="Buscar productos por categora, nombre, descripcion..." onkeyup="buscarProductos()">
+</div>
+
+<!-- Carrito de Compras -->
+<div class="carrito">
+    <button id="boton-carrito" onclick="toggleCarrito()">Ver Carrito (Total: <span id="total-carrito">0</span>)</button>
+    <div id="modal-carrito" class="modal">
+        <div class="modal-contenido">
+            <span class="cerrar" onclick="toggleCarrito()">&times;</span>
+            <h2>Productos en el Carrito</h2>
+            <!-- Mostrar productos en el carrito -->
+            {% if productos_en_carrito %}
+                <ul id="carrito-productos">
+                    {% for item in productos_en_carrito %}
+                        <li>
+                            <img style="width: 50px;height: auto;"  src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}" class="imagen-producto">
+                            <span>{{ item.producto.nombre }} - {{ item.cantidad }} unidades - Precio: <span class="precio">{{ item.producto.precio }}</span> - Total: <span class="total" id="total-{{ forloop.counter }}">{{ item.total }}</span></span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <h3>Total Carrito: <span id="total-carrito-modal">{{ total_carrito }}</span></h3>
+            {% else %}
+                <p>Tu carrito está vacío.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<h2>Agregar Producto</h2>
+
+<!-- Lista de productos en tarjetas -->
+<div class="productos" id="productos-container">
+    {% for producto in productos %}
+        <div class="tarjeta-producto">
+            {% if producto.imagen %} <!-- Verifica si hay imagen -->
+                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="imagen-producto">
+            {% endif %}
+            <h3>{{ producto.nombre }}</h3>
+            <p>Precio: <span class="precio">{{ producto.precio }}</span></p>
+            <p>Descripción: {{ producto.descripcion }}</p>
+            <p>Categoría: <span class="categoria">{{ producto.categoria.nombre }}</span></p> <!-- Agregar categoría -->
+            <form method="post" action="{% url 'agregar_producto' %}">
+                {% csrf_token %}
+                <input type="hidden" name="producto_id" value="{{ producto.id_producto }}">
+                <label for="cantidad_{{ producto.id_producto }}">Cantidad:</label>
+                <input type="number" id="cantidad_{{ producto.id_producto }}" name="cantidad" value="1" min="1">
+                <button type="submit">Agregar al Carrito</button>
+            </form>
+        </div>
+    {% endfor %}
+</div>
+
+<script>
+    function calcularTotal(precio, cantidad, index) {
+        const totalElement = document.getElementById('total-' + index);
+        const total = precio * cantidad;
+        totalElement.innerText = total.toFixed(2); // Mostrar total con dos decimales
+        actualizarTotalCarrito();
+    }
+
+    function actualizarTotalCarrito() {
+        const totalElements = document.querySelectorAll('.total');
+        let totalCarrito = 0;
+        totalElements.forEach((element) => {
+            totalCarrito += parseFloat(element.innerText);
+        });
+        document.getElementById('total-carrito').innerText = totalCarrito.toFixed(2); // Mostrar total carrito
+        document.getElementById('total-carrito-modal').innerText = totalCarrito.toFixed(2); // Mostrar total carrito en modal
+    }
+
+    // Inicializar el total del carrito al cargar la página
+    document.addEventListener('DOMContentLoaded', actualizarTotalCarrito);
+
+    function toggleCarrito() {
+        const modal = document.getElementById("modal-carrito");
+        modal.style.display = modal.style.display === "block" ? "none" : "block";
+    }
+
+    function buscarProductos() {
+        const input = document.getElementById('buscador-input');
+        const filter = input.value.toLowerCase();
+        const productosContainer = document.getElementById('productos-container');
+        const productos = productosContainer.getElementsByClassName('tarjeta-producto');
+
+        for (let i = 0; i < productos.length; i++) {
+            const nombre = productos[i].getElementsByTagName("h3")[0].innerText.toLowerCase();
+            const descripcion = productos[i].getElementsByTagName("p")[1].innerText.toLowerCase();
+            const categoria = productos[i].getElementsByClassName("categoria")[0].innerText.toLowerCase(); // Obtener categoría
+
+            if (filter.length === 0 || nombre.includes(filter) || descripcion.includes(filter) || categoria.includes(filter)) {
+                productos[i].style.display = "";
+            } else {
+                productos[i].style.display = "none";
+            }
+        }
+    }
+</script>
+
+<style>
+    .buscador {
+        margin-bottom: 20px;
+    }
+
+    .buscador input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .productos {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .tarjeta-producto {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 16px;
+        width: 200px; /* Ajusta el tamaño según sea necesario */
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s;
+    }
+
+    .tarjeta-producto:hover {
+        transform: scale(1.05);
+    }
+
+    .imagen-producto {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+    }
+
+    button {
+        background-color: #4CAF50; /* Verde */
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #45a049; /* Verde más oscuro */
+    }
+
+    .carrito {
+        position: fixed;
+        right: 20px;
+        top: 20px;
+        z-index: 1000;
+    }
+
+    .modal {
+        display: none; /* Oculto por defecto */
+        position: fixed; /* Fijo */
+        z-index: 1; /* Por encima de otros elementos */
+        left: 0;
+        top: 0;
+        width: 100%; /* 100% del ancho */
+        height: 100%; /* 100% del alto */
+        overflow: auto; /* Agregar scroll si es necesario */
+        background-color: rgb(0,0,0); /* Color de fondo */
+        background-color: rgba(0,0,0,0.4); /* Fondo negro con opacidad */
+    }
+
+    .modal-contenido {
+        background-color: #fefefe;
+        margin: 15% auto; /* 15% desde la parte superior y centrado */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%; /* Podría ser más o menos, dependiendo del diseño */
+    }
+
+    .cerrar {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .cerrar:hover,
+    .cerrar:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}

@@ -1,10 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
-from django.contrib import messages
+from django.contrib import messages 
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib import messages
-
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -46,7 +45,28 @@ def logout_view(request):
 
 # Vista para la página principal (Home)
 def home_view(request):
-    return render(request, 'home.html')  # Renderiza la plantilla 'home.html'
+    # Verifica si el usuario está autenticado
+    if request.user.is_authenticated:
+        try:
+            # Intenta obtener el Cliente y Vendedor asociados al usuario
+            cliente = Cliente.objects.get(user=request.user)
+            vendedor = Vendedor.objects.get(user=request.user)
+
+            # Ambos
+            tipo_usuario = 'Ambos'
+        except Cliente.DoesNotExist:
+            # Solo es vendedor
+            tipo_usuario = 'Vendedor' if Vendedor.objects.filter(user=request.user).exists() else 'Ninguno'
+        except Vendedor.DoesNotExist:
+            # Solo es cliente
+            tipo_usuario = 'Cliente' if Cliente.objects.filter(user=request.user).exists() else 'Ninguno'
+
+        # Pasar el tipo de usuario al contexto
+        context = {'tipo_usuario': tipo_usuario}
+        return render(request, 'home.html', context)  # Renderiza la plantilla 'home.html' con el contexto
+    else:
+        return render(request, 'home.html')  # Renderiza la plantilla sin el contexto si no está autenticado
+
 
 # Vista para la página de inicio (Index)
 def index_view(request):

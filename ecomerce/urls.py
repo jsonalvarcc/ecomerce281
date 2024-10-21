@@ -3,6 +3,8 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 from django.conf import settings
 from clientes.views import login_view,index_view,home_view,logout_view,register_view
+from carritos.views import carrito_view,agregar_producto_a_carrito
+from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index_view, name='index'),
@@ -10,6 +12,8 @@ urlpatterns = [
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
     path('register/', register_view, name='register'),
+    path('carrito/', carrito_view, name='carrito'),
+     path('agregar-producto/', agregar_producto_a_carrito, name='agregar_producto'),
     # URLs de restablecimiento de contraseña
     path('password_reset/',
          auth_views.PasswordResetView.as_view(success_url='/password_reset/done/'),
@@ -24,3 +28,5 @@ urlpatterns = [
          auth_views.PasswordResetCompleteView.as_view(),  # No se necesita la redirección aquí
          name='password_reset_complete'),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
