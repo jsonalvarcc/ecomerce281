@@ -2,45 +2,38 @@ from django.contrib import admin
 from .models import Cliente, Vendedor
 
 class ClienteAdmin(admin.ModelAdmin):
-    list_display = ('user', 'telefono', 'email')
-    search_fields = ('user__username', 'user__email', 'telefono')
-    list_filter = ('telefono',)
+    list_display = ('user', 'telefono', 'user_first_name', 'user_last_name', 'user_email')
     
-    # Detalles al ver un cliente
-    fieldsets = (
-        (None, {
-            'fields': ('user', 'telefono')
-        }),
-        ('Información Adicional', {
-            'fields': ('user__first_name', 'user__last_name', 'user__email'),
-            'classes': ('collapse',),
-        }),
-    )
+    def user_first_name(self, obj):
+        return obj.user.first_name
+    user_first_name.short_description = 'Nombre'
 
-    def email(self, obj):
+    def user_last_name(self, obj):
+        return obj.user.last_name
+    user_last_name.short_description = 'Apellido'
+    
+    def user_email(self, obj):
         return obj.user.email
-    email.short_description = 'Correo Electrónico'
+    user_email.short_description = 'Correo Electrónico'
+
+admin.site.register(Cliente, ClienteAdmin)
 
 class VendedorAdmin(admin.ModelAdmin):
-    list_display = ('user', 'telefono', 'email')
-    search_fields = ('user__username', 'user__email', 'telefono')
-    list_filter = ('telefono',)
+    list_display = ('user', 'telefono', 'user_first_name', 'user_last_name', 'user_email')
+    
+    def user_first_name(self, obj):
+        return obj.user.first_name
+    user_first_name.short_description = 'Nombre'
 
-    # Detalles al ver un vendedor
-    fieldsets = (
-        (None, {
-            'fields': ('user', 'telefono')
-        }),
-        ('Información Adicional', {
-            'fields': ('user__first_name', 'user__last_name', 'user__email'),
-            'classes': ('collapse',),
-        }),
-    )
+    def user_last_name(self, obj):
+        return obj.user.last_name
+    user_last_name.short_description = 'Apellido'
 
-    def email(self, obj):
+    def user_email(self, obj):
         return obj.user.email
-    email.short_description = 'Correo Electrónico'
+    user_email.short_description = 'Correo Electrónico'
+
+
 
 # Registro de modelos en el admin
-admin.site.register(Cliente, ClienteAdmin)
 admin.site.register(Vendedor, VendedorAdmin)

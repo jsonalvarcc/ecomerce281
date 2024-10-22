@@ -33,6 +33,7 @@
                     <label for="telefono">Teléfono:</label>
                     <input type="text" class="form-control" name="telefono" id="telefono" placeholder="Introduce tu número de teléfono">
                 </div>
+
                 <div class="form-group">
                     <label>Tipo de Usuario:</label>
                     <div class="form-check">
@@ -44,9 +45,46 @@
                         <label class="form-check-label" for="vendedor">Vendedor</label>
                     </div>
                 </div>
+
+                <!-- Campo oculto para coordenadas -->
+                <input type="hidden" name="coordenadas" id="coordenadas" required>
+
+                <!-- Contenedor para el mapa -->
+                <div id="map" style="height: 300px;"></div>
+
                 <button type="submit" class="btn btn-primary btn-block">Registrar</button>
             </form>
         </div>
     </div>
 </div>
+
+<!-- Incluir Leaflet CSS y JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+    // Inicializar el mapa
+    var map = L.map('map').setView([0, 0], 2); // Mapa centrado en el mundo
+
+    // Capa de mapa
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+    }).addTo(map);
+
+    // Marcador inicial
+    var marker = L.marker([0, 0]).addTo(map);
+    
+    // Evento de clic en el mapa
+    map.on('click', function(e) {
+        // Obtener coordenadas
+        var lat = e.latlng.lat;
+        var lng = e.latlng.lng;
+
+        // Actualizar el marcador
+        marker.setLatLng([lat, lng]);
+        
+        // Actualizar el campo oculto con las coordenadas
+        document.getElementById('coordenadas').value = lat + ',' + lng;
+    });
+</script>
 {% endblock %}

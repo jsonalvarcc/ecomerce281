@@ -1,4 +1,4 @@
-#clientes app models.py
+#models.py de app productos
 
 from django.db import models
 from clientes.models import Vendedor  

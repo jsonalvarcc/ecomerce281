@@ -1,3 +1,5 @@
+#models.py de la app carritos
+
 from django.db import models
 from clientes.models import Cliente  
 from productos.models import Producto  

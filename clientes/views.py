@@ -11,7 +11,37 @@ from .models import Cliente, Vendedor
 #registar usuario como cliente o vendedor
 
 
+
+
+
 def register_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        telefono = request.POST.get('telefono')
+        tipo_usuario = request.POST.get('tipo_usuario')  # 'cliente' o 'vendedor'
+        coordenadas = request.POST.get('coordenadas')  # Obtener coordenadas del formulario
+
+        # Crear el usuario
+        user = User.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name)
+
+        # Crear el cliente o vendedor basado en la selección
+        if tipo_usuario == 'cliente':
+            Cliente.objects.create(user=user, telefono=telefono, coordenadas=coordenadas)
+            messages.success(request, 'Cliente registrado correctamente.')
+        elif tipo_usuario == 'vendedor':
+            Vendedor.objects.create(user=user, telefono=telefono, coordenadas=coordenadas)
+            messages.success(request, 'Vendedor registrado correctamente.')
+
+        return redirect('login')  # Redirige al inicio de sesión o a donde desees
+
+    return render(request, 'registration/register.html')
+
+
+'''def register_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -34,7 +64,7 @@ def register_view(request):
 
         return redirect('login')  # Redirige al inicio de sesión o a donde desees
 
-    return render(request, 'registration/register.html')
+    return render(request, 'registration/register.html')'''
 
 
 
